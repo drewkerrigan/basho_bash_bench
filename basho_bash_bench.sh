@@ -92,7 +92,7 @@ fi
 #----------------------------------------------------------------------
 if [ "$WORKERS" -gt 1 ]
 then
-	if [ -e "worker_output1.txt" ]
+	if [ -e "$results_dir/worker_output1.txt" ]
 	then
 		echo "moving files to backup"
 		mv $results_dir/worker_output* $results_dir/backup/
