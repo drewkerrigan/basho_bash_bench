@@ -1,17 +1,20 @@
-basho-bash-bench
-================
+# basho-bash-bench
 
 A bash based driver for simple benchmarking tests, runs a benchmarking test given a product and options.
 
-usage : $1 -c <config file> -p <product> -s <size> -t <time> -w <workers> -o <operation> [-d]
+## Usage
 
-example usage : $1 -c basho_bash_bench.cfg -p cs -s 2 -t 60 -w 1 -o create
+./basho_bash_bench.sh -c <config file> -p <product> -s <size> -t <time> -w <workers> -o <operation> [-d]
+
+example usage : ./basho_bash_bench.sh -c basho_bash_bench.cfg -p cs -s 2 -t 60 -w 1 -o create
     (equivalent of old curl_test_cs_2MB_1HR_1WR_CREATE)
 		
--c <config: location of config file> 
--p <product: cs || cassandra || swift>
--s <size: (in MB) 2 | 24 | 136>
--t <time: (in min) 30 | 60 | 120>
--w <workers: 1 | 10 | 20 | 100>
--o <operation: create | read | update | delete | mix | create_fail | create_fail2 | create_fail3 | mix_fail | mix_fail2 | mix_fail3 | update_fail | delete_fail>
--d (debug, only prints diagnostic information about what will be run)
+## Options
+
+* -c (config: location of config file)
+* -p (product: cs | cassandra | swift)
+* -s (size: (in MB) 2 | 24 | 136)
+* -t (time: (in min) 30 | 60 | 120)
+* -w (workers: 1 | 10 | 20 | 100)
+* -o (operation: create | read | update | delete | mix | create_fail | create_fail2 | create_fail3 | mix_fail | mix_fail2 | mix_fail3 | update_fail | delete_fail)
+* -d (debug, only prints diagnostic information about what will be run)
