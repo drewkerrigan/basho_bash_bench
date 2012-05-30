@@ -122,7 +122,7 @@ function op_delete() {
 # PARAMETER 1: ---
 #=============================================================================
 function op_mix() {
-	if [ "$DEBUG" != TRUE ] && [ "$command" != "" ];
+	if [ "$DEBUG" == TRUE ];
 	then
     	op_create
     	op_read
