@@ -3,6 +3,6 @@
 # DESCRIPTION: Initialize the connection for this driver
 # PARAMETER 1: ---
 #=============================================================================
-function init() {
+function op_init() {
 	print_debug "Initializing"
 }
