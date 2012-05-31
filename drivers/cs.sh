@@ -8,6 +8,24 @@ function op_init() {
 }
 
 #=== FUNCTION ================================================================
+# NAME: op_init
+# DESCRIPTION: Initialize the connection for this driver
+# PARAMETER 1: string result
+# PARAMETER 2: string curl command
+#=============================================================================
+function op_record_result() {
+	result=$1
+	command=$2
+	
+	echo $result >> $results_dir/stats.txt
+	
+	if [[ "$result" != *"status:200"* ]] && [[ "$result" != *"status:204"* ]]
+	then
+		print_exception "Bad Status: $result from curl command: $command"
+	fi
+}
+
+#=== FUNCTION ================================================================
 # NAME: op_create
 # DESCRIPTION: run a single create call
 # PARAMETER 1: ---
@@ -22,21 +40,15 @@ function op_create() {
 	auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
 	hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
 	auth_header="AWS $moss_access_key:$hash_code"
-	command="curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber"
 	
-	if [ "$DEBUG" != TRUE ]
+	command="curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber"
+	print_debug "Curl command: $command"
+	
+	if [ "$DEBUG" != TRUE ] && [ "$filename" != "" ]
 	then
 		result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber`
-    	echo $result >> $results_dir/stats.txt
+		op_record_result $result $command
     	echo "$filename" >> $results_dir/filelist.txt
-    	
-    	if [[ "$result" != *"status:200"* ]] && [[ "$result" != *"status:204"* ]]
-    	then
-    		print_exception "Bad Status: $result from curl command: $command"
-    	fi
-    else
-		print_debug "Curl command:"
-		print_debug $command
     fi
 }
 
@@ -59,20 +71,14 @@ function op_read() {
 	    auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
 	    hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
 	    auth_header="AWS $moss_access_key:$hash_code"
+
 	    command="curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XGET --proxy1.0 $cs_proxy_host $cs_host/$path"
+	    print_debug "Curl command: $command"
 	    
-	    if [ "$DEBUG" != TRUE ]
+	    if [ "$DEBUG" != TRUE ] && [ "$filename" != "" ]
 		then
 			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XGET --proxy1.0 $cs_proxy_host $cs_host/$path`
-	    	echo $result >> $results_dir/stats.txt
-	    	
-	    	if [[ "$result" != *"status:200"* ]] && [[ "$result" != *"status:204"* ]]
-	    	then
-	    		print_exception "Bad Status: $result from curl command: $command"
-	    	fi
-	    else
-			print_debug "Curl command:"
-			print_debug $command
+	    	op_record_result $result $command
 	    fi
 	fi
 }
@@ -96,20 +102,14 @@ function op_update() {
 	    auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
 	    hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
 	    auth_header="AWS $moss_access_key:$hash_code"
+
 	    command="curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber"
+	    print_debug "Curl command: $command"
 	    
-	    if [ "$DEBUG" != TRUE ]
+	    if [ "$DEBUG" != TRUE ] && [ "$filename" != "" ]
 		then
 			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber`
-	    	echo $result >> $results_dir/stats.txt
-	    	
-	    	if [[ "$result" != *"status:200"* ]] && [[ "$result" != *"status:204"* ]]
-	    	then
-	    		print_exception "Bad Status: $result from curl command: $command"
-	    	fi
-	    else
-			print_debug "Curl command:"
-			print_debug $command
+	    	op_record_result $result $command
 	    fi
 	fi
 }
@@ -133,22 +133,15 @@ function op_delete() {
 	    auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
 	    hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
 	    auth_header="AWS $moss_access_key:$hash_code"
+
 	    command="curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XDELETE --proxy1.0 $cs_proxy_host $cs_host/$path"
+	    print_debug "Curl command: $command"
 	    
-	    
-	    if [ "$DEBUG" != TRUE ]
+	    if [ "$DEBUG" != TRUE ] && [ "$filename" != "" ]
 		then
 			sed -i "$(($line))d" ./filelist.txt
 			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XDELETE --proxy1.0 $cs_proxy_host $cs_host/$path`
-	    	echo $result >> $results_dir/stats.txt
-	    	
-	    	if [[ "$result" != *"status:200"* ]] && [[ "$result" != *"status:204"* ]]
-	    	then
-	    		print_exception "Bad Status: $result from curl command: $command"
-	    	fi
-	    else
-			print_debug "Curl command:"
-			print_debug $command
+	    	op_record_result $result $command
 	    fi
     fi
 }
