@@ -129,7 +129,7 @@ then
 	if [ -e "$results_dir/worker_output1.txt" ]
 	then
 		echo "Tailing $results_dir/worker_ouput1.txt to show progress, control-c to stop"
-		tail -f $results_dir/worker_ouput1.txt
+		tail -f $results_dir/worker_output1.txt
 	fi
 	
 	exit 0
