@@ -120,6 +120,18 @@ then
 		$0 -c $CONFIG -p $PRODUCT -s $SIZE -t $TIME -w 1 -o $OPERATION -r $results_dir $d &> $results_dir/worker_output$i.txt & 
 	done
 	
+	echo "Check $results_dir/stats.txt for performance results"
+	echo "Check $results_dir/exception.txt for statuses other than 204 and 200"
+	echo "Check $results_dir/worker_ouput1-$WORKERS.txt for individual worker information"
+
+	sleep 1
+
+	if [ -e "$results_dir/worker_output1.txt" ]
+	then
+		echo "Tailing $results_dir/worker_ouput1.txt to show progress, control-c to stop"
+		tail -f $results_dir/worker_ouput1.txt
+	fi
+	
 	exit 0
 fi
 
@@ -157,6 +169,10 @@ if [ "$OPERATION" == "create" ]
 then
 	if [ -e "filelist.txt" ] && [ "$RESULTSDIR" == "" ]; then mv filelist.txt{,.bak}; fi
 	if [ -e "$results_dir/filelist.txt" ]; then cp $results_dir/filelist.txt filelist.txt; fi
+	echo "$results_dir/filelist.txt was moved to ./filelist.txt, you can now run update, read, delete, and mix tests"
 fi
+
+echo "Check $results_dir/stats.txt for performance results"
+echo "Check $results_dir/exception.txt for statuses other than 204 and 200"
 
 exit 0
