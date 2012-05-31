@@ -116,7 +116,7 @@ function op_delete() {
 	    hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
 	    auth_header="AWS $moss_access_key:$hash_code"
 	    
-	    if [ "$DEBUG" != TRUE ] && [ "$filename"]
+	    if [ "$DEBUG" != TRUE ] && [ "$filename" != ""]
 		then
 			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XDELETE --proxy1.0 $cs_proxy_host $cs_host/$path`
 	    	echo $result >> $results_dir/stats.txt
