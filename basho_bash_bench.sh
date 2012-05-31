@@ -137,12 +137,12 @@ do
   
   timeleft=$((endtime - nowtime))
   
-  echo -ne "Time Left: $timeleft seconds\r"
+  echo -ne "    Time Left: $timeleft seconds\r"
   
   nowtime=$(date '+%s')
 done
 
-echo -ne "Time Left: 0 seconds, done!\r"
+echo "    Time Left: 0 seconds, done!\r"
 
 #----------------------------------------------------------------------
 # move filelist.txt to the base directory for future use
