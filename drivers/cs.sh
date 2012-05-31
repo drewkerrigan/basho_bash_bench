@@ -18,7 +18,7 @@ function op_create() {
 	header_date=$(date +'%a, %d %b %Y %T %Z')
 	filenumber=$(($RANDOM % 100))
 	filename=`(echo "$RANDOM" | md5sum | head -c 12)`
-	path="test/$filename"	
+	path="test/$filename"
 	auth_string="$method\n\napplication/octet-stream\n$header_date\n$path"
 	hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
 	auth_header="AWS $moss_access_key:$hash_code"

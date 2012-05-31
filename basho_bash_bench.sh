@@ -12,11 +12,12 @@ SIZE=""
 TIME=""
 WORKERS=""
 OPERATION=""
+RESULTSDIR=""
 
 #----------------------------------------------------------------------
 # populate values from command line options and validate
 #----------------------------------------------------------------------
-while getopts ":c:p:s:t:w:o:d" opt; do
+while getopts ":c:p:s:t:w:o:r:d" opt; do
   case $opt in
     c) CONFIG="${OPTARG}";;
     p) PRODUCT="${OPTARG}";;
@@ -24,6 +25,7 @@ while getopts ":c:p:s:t:w:o:d" opt; do
     t) TIME="${OPTARG}";;
     w) WORKERS="${OPTARG}";;
     o) OPERATION="${OPTARG}";;
+    r) RESULTSDIR="${OPTARG}";;
     d) DEBUG=TRUE;;
   esac
 done
@@ -53,7 +55,13 @@ print_debug "operation= $OPERATION"
 source $(dirname $0)/$CONFIG
 source $(dirname $0)/drivers/$PRODUCT.sh
 
-results_dir="./results/$PRODUCT-$SIZE-mb-$TIME-min-$WORKERS-wr-$OPERATION"
+if [ "$RESULTSDIR" == "" ]
+then
+	results_dir="./results/$PRODUCT-$SIZE-mb-$TIME-min-$WORKERS-wr-$OPERATION"
+else
+	results_dir="$RESULTSDIR"
+fi
+
 if [ -e "$results_dir" ]
 then
 	echo "found $results_dir"
@@ -66,14 +74,14 @@ fi
 #----------------------------------------------------------------------
 # cleanup or leave old data
 #----------------------------------------------------------------------
-if [ -e "$results_dir/stats.txt" ]
+if [ -e "$results_dir/stats.txt" ] && [ "$RESULTSDIR" == "" ]
 then
 	mv $results_dir/stats.txt{,.bak}
 fi
 
 if [ "$OPERATION" == "create" ]
 then
-	if [ -e "$results_dir/filelist.txt" ]
+	if [ -e "$results_dir/filelist.txt" ] && [ "$RESULTSDIR" == "" ]
 	then
 		mv $results_dir/filelist.txt{,.bak}
 	fi
@@ -104,7 +112,7 @@ then
 	for (( i=1; i<=$WORKERS; i++ ))
 	do
 		print_debug "Starting worker $i"
-		$0 -c $CONFIG -p $PRODUCT -s $SIZE -t $TIME -w 1 -o $OPERATION $d &> $results_dir/worker_output$i.txt & 
+		$0 -c $CONFIG -p $PRODUCT -s $SIZE -t $TIME -w 1 -o $OPERATION -r $results_dir $d &> $results_dir/worker_output$i.txt & 
 	done
 	
 	exit 0
@@ -130,9 +138,13 @@ do
   nowtime=$(date '+%s')
 done
 
+#----------------------------------------------------------------------
+# move filelist.txt to the base directory for future use
+#----------------------------------------------------------------------
+
 if [ "$OPERATION" == "create" ]
 then
-	if [ -e "filelist.txt" ]; then mv filelist.txt{,.bak}; fi
+	if [ -e "filelist.txt" ] && [ "$RESULTSDIR" == "" ]; then mv filelist.txt{,.bak}; fi
 	if [ -e "$results_dir/filelist.txt" ]; then cp $results_dir/filelist.txt filelist.txt; fi
 fi
 
