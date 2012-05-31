@@ -19,7 +19,7 @@ function op_create() {
 	filenumber=$(($RANDOM % 100))
 	filename=`(echo "$RANDOM" | md5sum | head -c 12)`
 	path="test/$filename"
-	auth_string="$method\n\napplication/octet-stream\n$header_date\n$path"
+	auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
 	hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
 	auth_header="AWS $moss_access_key:$hash_code"
 	
@@ -47,7 +47,7 @@ function op_read() {
     filename=$(awk "NR==$line" ./filelist.txt)
     output_filename=`(echo "$RANDOM" | md5sum | head -c 12)`
     path="test/$filename"
-    auth_string="$method\n\napplication/octet-stream\n$header_date\n$path"
+    auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
     hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
     auth_header="AWS $moss_access_key:$hash_code"
     
@@ -74,7 +74,7 @@ function op_update() {
     line=$(($RANDOM % $filecount))
     filename=$(awk "NR==$line" ./filelist.txt)
     path="test/$filename"
-    auth_string="$method\n\napplication/octet-stream\n$header_date\n$path"
+    auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
     hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
     auth_header="AWS $moss_access_key:$hash_code"
     
@@ -102,7 +102,7 @@ function op_delete() {
     filename=$(awk "NR==$line" ./filelist.txt)
     sed -i "$(($line))d" ./filelist.txt
     path="test/$filename"
-    auth_string="$method\n\napplication/octet-stream\n$header_date\n$path"
+    auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
     hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
     auth_header="AWS $moss_access_key:$hash_code"
     
