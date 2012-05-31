@@ -135,7 +135,7 @@ do
   
   if [ "$DEBUG" == TRUE ]; then break; fi
   
-  timeleft=(($endtime - $nowtime))
+  timeleft=$((endtime - nowtime))
   
   echo -ne "Time Left: $timeleft seconds\r"
   
