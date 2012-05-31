@@ -8,8 +8,8 @@ function op_init() {
 }
 
 #=== FUNCTION ================================================================
-# NAME: op_init
-# DESCRIPTION: Initialize the connection for this driver
+# NAME: op_record_result
+# DESCRIPTION: Records statistics and logs exceptions
 # PARAMETER 1: string result
 # PARAMETER 2: string curl command
 #=============================================================================

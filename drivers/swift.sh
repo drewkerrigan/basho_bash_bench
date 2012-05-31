@@ -8,6 +8,24 @@ function op_init() {
 }
 
 #=== FUNCTION ================================================================
+# NAME: op_record_result
+# DESCRIPTION: Records statistics and logs exceptions
+# PARAMETER 1: string result
+# PARAMETER 2: string curl command
+#=============================================================================
+function op_record_result() {
+	result=$1
+	command=$2
+	
+	echo $result >> $results_dir/stats.txt
+	
+	if [[ "$result" != *"status:200"* ]] && [[ "$result" != *"status:204"* ]]
+	then
+		print_exception "Bad Status: $result from curl command: $command"
+	fi
+}
+
+#=== FUNCTION ================================================================
 # NAME: op_create
 # DESCRIPTION: run a single create call
 # PARAMETER 1: ---
@@ -16,15 +34,15 @@ function op_create() {
 	print_debug "Enter op_create()"
 	filenumber=$(($RANDOM % 100))
 	filename=`(echo "$RANDOM" | md5sum | head -c 12)`
+	
+	command="curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"X-Auth-Token: $swift_auth_token\" -H \"Content-Type: application/junk\" -XPUT $swift_host/v1/AUTH_system/testdemo/$filename -T ./$common_file_location/$filenumber"
+	print_debug "Curl command: $command"
 
 	if [ "$DEBUG" != TRUE ]
 	then
 		result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "X-Auth-Token: $swift_auth_token" -H "Content-Type: application/junk" -XPUT $swift_host/v1/AUTH_system/testdemo/$filename -T ./$common_file_location/$filenumber`
-    	echo $result >> $results_dir/stats.txt
+		op_record_result $result $command
     	echo "$filename" >> $results_dir/filelist.txt
-    else
-		print_debug "Curl command:"
-		print_debug "curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"X-Auth-Token: $swift_auth_token\" -H \"Content-Type: application/junk\" -XPUT $swift_host/v1/AUTH_system/testdemo/$filename -T ./$common_file_location/$filenumber"
     fi
 }
 
@@ -36,17 +54,20 @@ function op_create() {
 function op_read() {
 	print_debug "Enter op_read()"
 	filecount=$(wc -l ./filelist.txt | sed -s "s/ .\/filelist.txt//")
-	line=$(($RANDOM % $filecount + 1))
-	filename=$(awk "NR==$line" ./filelist.txt)
-
-    if [ "$DEBUG" != TRUE ]
+	if [ $filecount -gt 1 ]
 	then
-		result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "X-Auth-Token: $swift_auth_token" -H "Content-Type: application/junk" -XGET $swift_host/v1/AUTH_system/testdemo/$filename`
-    	echo $result >> $results_dir/stats.txt
-    else
-		print_debug "Curl command:"
-		print_debug "curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"X-Auth-Token: $swift_auth_token\" -H \"Content-Type: application/junk\" -XGET $swift_host/v1/AUTH_system/testdemo/$filename"
-    fi
+		line=$(($RANDOM % $filecount + 1))
+		filename=$(awk "NR==$line" ./filelist.txt)
+		
+		command="curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"X-Auth-Token: $swift_auth_token\" -H \"Content-Type: application/junk\" -XGET $swift_host/v1/AUTH_system/testdemo/$filename"
+		print_debug "Curl command: $command"
+	
+	    if [ "$DEBUG" != TRUE ] && [ "$filename" != "" ]
+		then
+			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "X-Auth-Token: $swift_auth_token" -H "Content-Type: application/junk" -XGET $swift_host/v1/AUTH_system/testdemo/$filename`
+	    	op_record_result $result $command
+	    fi
+	fi
 }
 
 #=== FUNCTION ================================================================
@@ -56,19 +77,22 @@ function op_read() {
 #=============================================================================
 function op_update() {
 	print_debug "Enter op_update()"
-	filenumber=$(($RANDOM % 100))
 	filecount=$(wc -l ./filelist.txt | sed -s "s/ .\/filelist.txt//")
-	line=$(($RANDOM % $filecount + 1))
-	filename=$(awk "NR==$line" ./filelist.txt)
-    
-    if [ "$DEBUG" != TRUE ]
+	if [ $filecount -gt 1 ]
 	then
-		result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "X-Auth-Token: $swift_auth_token" -H "Content-Type: application/junk" -XPUT $swift_host/v1/AUTH_system/testdemo/$filename -T ./$common_file_location/$filenumber`
-    	echo $result >> $results_dir/stats.txt
-    else
-		print_debug "Curl command:"
-		print_debug "curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"X-Auth-Token: $swift_auth_token\" -H \"Content-Type: application/junk\" -XPUT $swift_host/v1/AUTH_system/testdemo/$filename -T ./$common_file_location/$filenumber"
-    fi
+		filenumber=$(($RANDOM % 100))
+		line=$(($RANDOM % $filecount + 1))
+		filename=$(awk "NR==$line" ./filelist.txt)
+		
+		command="curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"X-Auth-Token: $swift_auth_token\" -H \"Content-Type: application/junk\" -XPUT $swift_host/v1/AUTH_system/testdemo/$filename -T ./$common_file_location/$filenumber"
+		print_debug "Curl command: $command"
+	    
+	    if [ "$DEBUG" != TRUE ] && [ "$filename" != "" ]
+		then
+			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "X-Auth-Token: $swift_auth_token" -H "Content-Type: application/junk" -XPUT $swift_host/v1/AUTH_system/testdemo/$filename -T ./$common_file_location/$filenumber`
+	    	op_record_result $result $command
+	    fi
+	fi
 }
 
 #=== FUNCTION ================================================================
@@ -79,18 +103,21 @@ function op_update() {
 function op_delete() {
 	print_debug "Enter op_delete()"
 	filecount=$(wc -l ./filelist.txt | sed -s "s/ .\/filelist.txt//")
-	line=$(($RANDOM % $filecount + 1))
-	filename=$(awk "NR==$line" ./filelist.txt)
-    
-    if [ "$DEBUG" != TRUE ]
+	if [ $filecount -gt 1 ]
 	then
-		result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "X-Auth-Token: $swift_auth_token" -XDELETE $swift_host/v1/AUTH_system/testdemo/$filename`
-    	echo $result >> $results_dir/stats.txt
-    	sed -i "$(($line))d" ./filelist.txt
-    else
-		print_debug "Curl command:"
-		print_debug "curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"X-Auth-Token: $swift_auth_token\" -XDELETE $swift_host/v1/AUTH_system/testdemo/$filename"
-    fi
+		line=$(($RANDOM % $filecount + 1))
+		filename=$(awk "NR==$line" ./filelist.txt)
+		
+		command="curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"X-Auth-Token: $swift_auth_token\" -XDELETE $swift_host/v1/AUTH_system/testdemo/$filename"
+		print_debug "Curl command: $command"
+	    
+	    if [ "$DEBUG" != TRUE ] && [ "$filename" != "" ]
+		then
+			sed -i "$(($line))d" ./filelist.txt
+			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "X-Auth-Token: $swift_auth_token" -XDELETE $swift_host/v1/AUTH_system/testdemo/$filename`
+			op_record_result $result $command
+	    fi
+	fi
 }
 
 #=== FUNCTION ================================================================
