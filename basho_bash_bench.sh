@@ -142,7 +142,7 @@ do
   nowtime=$(date '+%s')
 done
 
-echo "    Time Left: 0 seconds, done!\r"
+echo "    Time Left: 0 seconds, done!"
 
 #----------------------------------------------------------------------
 # move filelist.txt to the base directory for future use
