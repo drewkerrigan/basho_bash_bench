@@ -36,7 +36,7 @@ function op_create() {
 function op_read() {
 	print_debug "Enter op_read()"
 	filecount=$(wc -l ./filelist.txt | sed -s "s/ .\/filelist.txt//")
-	line=$(($RANDOM % $filecount))
+	line=$(($RANDOM % $filecount + 1))
 	filename=$(awk "NR==$line" ./filelist.txt)
 
     if [ "$DEBUG" != TRUE ]
@@ -58,7 +58,7 @@ function op_update() {
 	print_debug "Enter op_update()"
 	filenumber=$(($RANDOM % 100))
 	filecount=$(wc -l ./filelist.txt | sed -s "s/ .\/filelist.txt//")
-	line=$(($RANDOM % $filecount))
+	line=$(($RANDOM % $filecount + 1))
 	filename=$(awk "NR==$line" ./filelist.txt)
     
     if [ "$DEBUG" != TRUE ]
@@ -79,14 +79,14 @@ function op_update() {
 function op_delete() {
 	print_debug "Enter op_delete()"
 	filecount=$(wc -l ./filelist.txt | sed -s "s/ .\/filelist.txt//")
-	line=$(($RANDOM % $filecount))
+	line=$(($RANDOM % $filecount + 1))
 	filename=$(awk "NR==$line" ./filelist.txt)
-	sed -i "$(($line))d" ./filelist.txt
     
     if [ "$DEBUG" != TRUE ]
 	then
 		result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "X-Auth-Token: $swift_auth_token" -XDELETE $swift_host/v1/AUTH_system/testdemo/$filename`
     	echo $result >> $results_dir/stats.txt
+    	sed -i "$(($line))d" ./filelist.txt
     else
 		print_debug "Curl command:"
 		print_debug "curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"X-Auth-Token: $swift_auth_token\" -XDELETE $swift_host/v1/AUTH_system/testdemo/$filename"
