@@ -41,7 +41,7 @@ function op_create() {
 	if [ "$DEBUG" != TRUE ]
 	then
 		result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "X-Auth-Token: $swift_auth_token" -H "Content-Type: application/junk" -XPUT $swift_host/v1/AUTH_system/testdemo/$filename -T ./$common_file_location/$filenumber`
-		op_record_result $result $command
+		op_record_result "$result" "$command"
     	echo "$filename" >> $results_dir/filelist.txt
     fi
 }
@@ -65,7 +65,7 @@ function op_read() {
 	    if [ "$DEBUG" != TRUE ] && [ "$filename" != "" ]
 		then
 			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "X-Auth-Token: $swift_auth_token" -H "Content-Type: application/junk" -XGET $swift_host/v1/AUTH_system/testdemo/$filename`
-	    	op_record_result $result $command
+	    	op_record_result "$result" "$command"
 	    fi
 	fi
 }
@@ -90,7 +90,7 @@ function op_update() {
 	    if [ "$DEBUG" != TRUE ] && [ "$filename" != "" ]
 		then
 			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "X-Auth-Token: $swift_auth_token" -H "Content-Type: application/junk" -XPUT $swift_host/v1/AUTH_system/testdemo/$filename -T ./$common_file_location/$filenumber`
-	    	op_record_result $result $command
+	    	op_record_result "$result" "$command"
 	    fi
 	fi
 }
@@ -115,7 +115,7 @@ function op_delete() {
 		then
 			sed -i "$(($line))d" ./filelist.txt
 			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "X-Auth-Token: $swift_auth_token" -XDELETE $swift_host/v1/AUTH_system/testdemo/$filename`
-			op_record_result $result $command
+			op_record_result "$result" "$command"
 	    fi
 	fi
 }

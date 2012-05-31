@@ -47,7 +47,7 @@ function op_create() {
 	if [ "$DEBUG" != TRUE ] && [ "$filename" != "" ]
 	then
 		result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber`
-		op_record_result $result $command
+		op_record_result "$result" "$command"
     	echo "$filename" >> $results_dir/filelist.txt
     fi
 }
@@ -78,7 +78,7 @@ function op_read() {
 	    if [ "$DEBUG" != TRUE ] && [ "$filename" != "" ]
 		then
 			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XGET --proxy1.0 $cs_proxy_host $cs_host/$path`
-	    	op_record_result $result $command
+	    	op_record_result "$result" "$command"
 	    fi
 	fi
 }
@@ -109,7 +109,7 @@ function op_update() {
 	    if [ "$DEBUG" != TRUE ] && [ "$filename" != "" ]
 		then
 			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber`
-	    	op_record_result $result $command
+	    	op_record_result "$result" "$command"
 	    fi
 	fi
 }
@@ -141,7 +141,7 @@ function op_delete() {
 		then
 			sed -i "$(($line))d" ./filelist.txt
 			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XDELETE --proxy1.0 $cs_proxy_host $cs_host/$path`
-	    	op_record_result $result $command
+	    	op_record_result "$result" "$command"
 	    fi
     fi
 }
