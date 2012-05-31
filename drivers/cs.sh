@@ -118,9 +118,9 @@ function op_delete() {
 	    
 	    if [ "$DEBUG" != TRUE ]
 		then
+			sed -i "$(($line))d" ./filelist.txt
 			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XDELETE --proxy1.0 $cs_proxy_host $cs_host/$path`
 	    	echo $result >> $results_dir/stats.txt
-	    	sed -i "$(($line))d" ./filelist.txt
 	    else
 			print_debug "Curl command:"
 			print_debug "curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XDELETE --proxy1.0 $cs_proxy_host $cs_host/$path"
