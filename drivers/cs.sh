@@ -41,25 +41,28 @@ function op_create() {
 #=============================================================================
 function op_read() {
 	print_debug "Enter op_read()"
-	method="GET"
-	header_date=$(date +'%a, %d %b %Y %T %Z')
-    filecount=$(wc -l ./filelist.txt | sed -s "s/ .\/filelist.txt//")
-    line=$(($RANDOM % $filecount))
-    filename=$(awk "NR==$line" ./filelist.txt)
-    output_filename=`(echo "$RANDOM" | md5sum | head -c 12)`
-    path="test/$filename"
-    auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
-    hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
-    auth_header="AWS $moss_access_key:$hash_code"
-    
-    if [ "$DEBUG" != TRUE ]
+	filecount=$(wc -l ./filelist.txt | sed -s "s/ .\/filelist.txt//")
+	if [ $filecount -gt 1 ]
 	then
-		result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XGET --proxy1.0 $cs_proxy_host $cs_host/$path`
-    	echo $result >> $results_dir/stats.txt
-    else
-		print_debug "Curl command:"
-		print_debug "curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XGET --proxy1.0 $cs_proxy_host $cs_host/$path"
-    fi
+		method="GET"
+		header_date=$(date +'%a, %d %b %Y %T %Z')
+	    line=$(($RANDOM % $filecount))
+	    filename=$(awk "NR==$line" ./filelist.txt)
+	    output_filename=`(echo "$RANDOM" | md5sum | head -c 12)`
+	    path="test/$filename"
+	    auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
+	    hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
+	    auth_header="AWS $moss_access_key:$hash_code"
+	    
+	    if [ "$DEBUG" != TRUE ]
+		then
+			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XGET --proxy1.0 $cs_proxy_host $cs_host/$path`
+	    	echo $result >> $results_dir/stats.txt
+	    else
+			print_debug "Curl command:"
+			print_debug "curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XGET --proxy1.0 $cs_proxy_host $cs_host/$path"
+	    fi
+	fi
 }
 
 #=== FUNCTION ================================================================
@@ -69,25 +72,28 @@ function op_read() {
 #=============================================================================
 function op_update() {
 	print_debug "Enter op_update()"
-	method="PUT"
-	header_date=$(date +'%a, %d %b %Y %T %Z')
-    filenumber=$(($RANDOM % 100))
-    filecount=$(wc -l ./filelist.txt | sed -s "s/ .\/filelist.txt//")
-    line=$(($RANDOM % $filecount))
-    filename=$(awk "NR==$line" ./filelist.txt)
-    path="test/$filename"
-    auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
-    hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
-    auth_header="AWS $moss_access_key:$hash_code"
-    
-    if [ "$DEBUG" != TRUE ]
+	filecount=$(wc -l ./filelist.txt | sed -s "s/ .\/filelist.txt//")
+	if [ $filecount -gt 1 ]
 	then
-		result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber`
-    	echo $result >> $results_dir/stats.txt
-    else
-		print_debug "Curl command:"
-		print_debug "curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber"
-    fi
+		method="PUT"
+		header_date=$(date +'%a, %d %b %Y %T %Z')
+	    filenumber=$(($RANDOM % 100))
+	    line=$(($RANDOM % $filecount))
+	    filename=$(awk "NR==$line" ./filelist.txt)
+	    path="test/$filename"
+	    auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
+	    hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
+	    auth_header="AWS $moss_access_key:$hash_code"
+	    
+	    if [ "$DEBUG" != TRUE ]
+		then
+			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber`
+	    	echo $result >> $results_dir/stats.txt
+	    else
+			print_debug "Curl command:"
+			print_debug "curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber"
+	    fi
+	fi
 }
 
 #=== FUNCTION ================================================================
@@ -97,25 +103,29 @@ function op_update() {
 #=============================================================================
 function op_delete() {
 	print_debug "Enter op_delete()"
-	method="DELETE"
-	header_date=$(date +'%a, %d %b %Y %T %Z')
-    filenumber=$(($RANDOM % 100))
-    filecount=$(wc -l ./filelist.txt | sed -s "s/ .\/filelist.txt//")
-    line=$(($RANDOM % $filecount))
-    filename=$(awk "NR==$line" ./filelist.txt)
-    sed -i "$(($line))d" ./filelist.txt
-    path="test/$filename"
-    auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
-    hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
-    auth_header="AWS $moss_access_key:$hash_code"
-    
-    if [ "$DEBUG" != TRUE ]
+	
+	filecount=$(wc -l ./filelist.txt | sed -s "s/ .\/filelist.txt//")
+	if [ $filecount -gt 1 ]
 	then
-		result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XDELETE --proxy1.0 $cs_proxy_host $cs_host/$path`
-    	echo $result >> $results_dir/stats.txt
-    else
-		print_debug "Curl command:"
-		print_debug "curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XDELETE --proxy1.0 $cs_proxy_host $cs_host/$path"
+		method="DELETE"
+		header_date=$(date +'%a, %d %b %Y %T %Z')
+	    filenumber=$(($RANDOM % 100))
+	    line=$(($RANDOM % $filecount))
+	    filename=$(awk "NR==$line" ./filelist.txt)
+	    sed -i "$(($line))d" ./filelist.txt
+	    path="test/$filename"
+	    auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
+	    hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
+	    auth_header="AWS $moss_access_key:$hash_code"
+	    
+	    if [ "$DEBUG" != TRUE ]
+		then
+			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XDELETE --proxy1.0 $cs_proxy_host $cs_host/$path`
+	    	echo $result >> $results_dir/stats.txt
+	    else
+			print_debug "Curl command:"
+			print_debug "curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XDELETE --proxy1.0 $cs_proxy_host $cs_host/$path"
+	    fi
     fi
 }
 
