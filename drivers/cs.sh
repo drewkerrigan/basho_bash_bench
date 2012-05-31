@@ -22,15 +22,21 @@ function op_create() {
 	auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
 	hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
 	auth_header="AWS $moss_access_key:$hash_code"
+	command="curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber"
 	
 	if [ "$DEBUG" != TRUE ]
 	then
 		result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber`
     	echo $result >> $results_dir/stats.txt
     	echo "$filename" >> $results_dir/filelist.txt
+    	
+    	if [[ "$result" != *"status:200"* ]] && [[ "$result" != *"status:204"* ]]
+    	then
+    		print_exception "Bad Status: $result from curl command: $command"
+    	fi
     else
 		print_debug "Curl command:"
-		print_debug "curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber"
+		print_debug $command
     fi
 }
 
@@ -53,14 +59,20 @@ function op_read() {
 	    auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
 	    hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
 	    auth_header="AWS $moss_access_key:$hash_code"
+	    command="curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XGET --proxy1.0 $cs_proxy_host $cs_host/$path"
 	    
 	    if [ "$DEBUG" != TRUE ]
 		then
 			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XGET --proxy1.0 $cs_proxy_host $cs_host/$path`
 	    	echo $result >> $results_dir/stats.txt
+	    	
+	    	if [[ "$result" != *"status:200"* ]] && [[ "$result" != *"status:204"* ]]
+	    	then
+	    		print_exception "Bad Status: $result from curl command: $command"
+	    	fi
 	    else
 			print_debug "Curl command:"
-			print_debug "curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XGET --proxy1.0 $cs_proxy_host $cs_host/$path"
+			print_debug $command
 	    fi
 	fi
 }
@@ -84,14 +96,20 @@ function op_update() {
 	    auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
 	    hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
 	    auth_header="AWS $moss_access_key:$hash_code"
+	    command="curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber"
 	    
 	    if [ "$DEBUG" != TRUE ]
 		then
 			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber`
 	    	echo $result >> $results_dir/stats.txt
+	    	
+	    	if [[ "$result" != *"status:200"* ]] && [[ "$result" != *"status:204"* ]]
+	    	then
+	    		print_exception "Bad Status: $result from curl command: $command"
+	    	fi
 	    else
 			print_debug "Curl command:"
-			print_debug "curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XPUT --proxy1.0 $cs_proxy_host $cs_host/$path -T ./$common_file_location/$filenumber"
+			print_debug $command
 	    fi
 	fi
 }
@@ -115,15 +133,22 @@ function op_delete() {
 	    auth_string="$method\n\napplication/octet-stream\n$header_date\n/$path"
 	    hash_code=`echo -n -e "$auth_string" | openssl dgst -binary -sha1 -hmac $moss_secret_key | base64`
 	    auth_header="AWS $moss_access_key:$hash_code"
+	    command="curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XDELETE --proxy1.0 $cs_proxy_host $cs_host/$path"
+	    
 	    
 	    if [ "$DEBUG" != TRUE ]
 		then
 			sed -i "$(($line))d" ./filelist.txt
 			result=`curl -o /dev/null -w "time:%{time_total},status:%{http_code}" -k -s -H "Authorization: $auth_header" -H "Content-Type: application/octet-stream" -H "Date: $header_date" -XDELETE --proxy1.0 $cs_proxy_host $cs_host/$path`
 	    	echo $result >> $results_dir/stats.txt
+	    	
+	    	if [[ "$result" != *"status:200"* ]] && [[ "$result" != *"status:204"* ]]
+	    	then
+	    		print_exception "Bad Status: $result from curl command: $command"
+	    	fi
 	    else
 			print_debug "Curl command:"
-			print_debug "curl -o /dev/null -w \"time:%{time_total},status:%{http_code}\" -k -s -H \"Authorization: $auth_header\" -H \"Content-Type: application/octet-stream\" -H \"Date: $header_date\" -XDELETE --proxy1.0 $cs_proxy_host $cs_host/$path"
+			print_debug $command
 	    fi
     fi
 }

@@ -74,6 +74,11 @@ fi
 #----------------------------------------------------------------------
 # cleanup or leave old data
 #----------------------------------------------------------------------
+if [ -e "$results_dir/exception.txt" ]
+then
+	mv $results_dir/exception.txt{,.bak}
+fi
+
 if [ -e "$results_dir/stats.txt" ] && [ "$RESULTSDIR" == "" ]
 then
 	mv $results_dir/stats.txt{,.bak}

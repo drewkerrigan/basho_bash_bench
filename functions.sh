@@ -40,5 +40,5 @@ function print_debug() {
 # PARAMETER 1: message
 #=============================================================================
 function print_exception() {
-	echo "**EXCEPTION**: $1"; 
+	echo "**EXCEPTION**: $1" >> $results_dir/exception.txt
 }
