@@ -42,6 +42,7 @@ function op_create() {
 function op_read() {
 	print_debug "Enter op_read()"
 	method="GET"
+	header_date=$(date +'%a, %d %b %Y %T %Z')
     filecount=$(wc -l ./filelist.txt | sed -s "s/ .\/filelist.txt//")
     line=$(($RANDOM % $filecount))
     filename=$(awk "NR==$line" ./filelist.txt)
@@ -69,6 +70,7 @@ function op_read() {
 function op_update() {
 	print_debug "Enter op_update()"
 	method="PUT"
+	header_date=$(date +'%a, %d %b %Y %T %Z')
     filenumber=$(($RANDOM % 100))
     filecount=$(wc -l ./filelist.txt | sed -s "s/ .\/filelist.txt//")
     line=$(($RANDOM % $filecount))
@@ -96,6 +98,7 @@ function op_update() {
 function op_delete() {
 	print_debug "Enter op_delete()"
 	method="DELETE"
+	header_date=$(date +'%a, %d %b %Y %T %Z')
     filenumber=$(($RANDOM % 100))
     filecount=$(wc -l ./filelist.txt | sed -s "s/ .\/filelist.txt//")
     line=$(($RANDOM % $filecount))
