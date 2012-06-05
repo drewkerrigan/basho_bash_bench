@@ -19,7 +19,7 @@ function op_record_result() {
 	
 	echo $result >> $results_dir/stats.txt
 	
-	if [[ "$result" != *"status:200"* ]] && [[ "$result" != *"status:204"* ]]
+	if [[ "$result" != *"status:200"* ]] && [[ "$result" != *"status:204"* ]] && [[ "$result" != *"status:201"* ]]
 	then
 		print_exception "Bad Status: $result from curl command: $command"
 	fi
