@@ -3,11 +3,15 @@
 A bash based driver for simple benchmarking tests, runs a benchmarking test given a product and options.
 
 ## Usage
-
+```
 ./basho_bash_bench.sh -c (config file) -p (product) -s (size) -t (time) -w (workers) -o (operation) [-d]
+```
 
-example usage : ./basho_bash_bench.sh -c basho_bash_bench.cfg -p cs -s 2 -t 60 -w 1 -o create
-    (equivalent of old curl_test_cs_2MB_1HR_1WR_CREATE)
+example usage (equivalent of old curl_test_cs_2MB_1HR_1WR_CREATE): 
+```
+./basho_bash_bench.sh -c basho_bash_bench.cfg -p cs -s 2 -t 60 -w 1 -o create
+```
+    
 		
 ## Options
 
